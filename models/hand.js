@@ -2,9 +2,9 @@ var ObjectId = require('mongodb').ObjectID;
 
 var hand_class = class Hand{
 	constructor(game_id){
-		this._id = getNextSequence("handid");
+		//this._id = getNextSequence("handid");
 		this.game_id = game_id;
-		this.deck = make_deck();
+		this.deck = this.make_deck();
 		this.winner = "";
 		this.total_pot = 0;
 		this.date = new Date();
@@ -12,14 +12,23 @@ var hand_class = class Hand{
 
 	make_deck(){
 		var deck = new Array();
-		var suits = ['D', 'C', 'S', 'A'];
-		for(i = 0; i<suits.length;i++){
-			for(j = 0; j<13; j++){
+		var suits = ['D', 'C', 'S', 'H'];
+		for(var i = 0; i<suits.length;i++){
+			for(var j = 1; j<14; j++){
 				var card = { "suit": suits[i], "num": j};
 				deck.push(card);
 			}
 		}
 		return deck;
+	}
+
+	deal(){
+		var index = Math.floor(Math.random() * this.deck.length);	
+		return this.deck.splice(index, 1)[0];
+	}
+
+	calculate_individual_score(cards){
+
 	}
 }
 
