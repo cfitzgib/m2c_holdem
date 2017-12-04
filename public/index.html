@@ -1,0 +1,18 @@
+<html>
+	<head>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+		<script src = "form_ajax.js"></script>
+	</head>
+	<body>
+		<h1>Hold'Em</h1>
+		<h3>Free Online Texas Hold'Em</h3>
+
+		<form onsubmit = "return false;">
+			Sign In
+			Username: <input type="text" id= "username" name = "username"><br/>
+			Password: <input type="password" id = "password" name = "password"><br/>
+			<input type = "submit" value="Log In" onclick="login()">
+		</form>
+		<div id="response"></div>
+	</body>
+</html>

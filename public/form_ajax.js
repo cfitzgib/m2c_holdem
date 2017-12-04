@@ -121,3 +121,21 @@ function get_hand_by_username(){
 		}
 	})
 }
+
+function login(){
+	var username = $("#username").val();
+	var password = $("#password").val();
+	$.ajax({
+		url: '/login/' + username + '/' + password,
+		type: 'GET',
+		success: function(result){
+			if(result)
+				$("#response").html("Successfully logged in" + username);
+			else
+				$("#response").html("Invalid username or password.");
+		},
+		error: function(result){
+			$("#response").html("Invalid username or password");
+		}
+	});
+}

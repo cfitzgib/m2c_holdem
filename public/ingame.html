@@ -1,0 +1,23 @@
+<html>
+	<head>
+		<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src = "javascripts/clientSocket.js"></script>
+	</head>
+	<body>
+		
+		<div id = "game_start">
+		</div>
+
+		<div id = "game">
+			<div id = "jackpot"></div>
+			<button id="check" type = "button" onclick="check()">Check</button><button id="fold" type = "button" onclick="fold()">Fold</button><br/>
+			<input id="raise_amt" type = "number"><button id="raise" type = "button" onclick="raise()">Raise</button><br/>
+			Your hand this round: <span id="cards"> </span><br/>
+			Your bet this round: <span id = "bet"></span><br/>
+			Current max bet: <span id = "max_bet"></span><br/>
+
+			The flop: <span id="flop"></span>
+		</div>
+	</body>
+</html>

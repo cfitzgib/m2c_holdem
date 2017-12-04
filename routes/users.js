@@ -2,6 +2,7 @@ var user = require("../models/user.js");
 
 exports.init = function(app) {
   app.get("/user/:username", getUser);
+  app.get("/login/:username/:password", loginUser);
   app.put("/user/:username/:password", updateUser);
   app.post("/user", createUser);
   app.delete("/user/:username", deleteUser);
@@ -10,7 +11,6 @@ exports.init = function(app) {
 
   // Handle the getUser route
 getUser = function(request, response) {
-  console.log(request.body);
 	user.read_user(request.params.username, function(result){
     response.send(result);
   });
@@ -42,4 +42,11 @@ createGame = function(request, response) {
   user.create_game(function(result){
     response.send(result);
   })
+}
+
+loginUser = function(request, response){
+  var params  = {"username": request.params.username, "password": request.params.password};
+  user.login(params, function(result){
+    response.send(result);
+  });
 }

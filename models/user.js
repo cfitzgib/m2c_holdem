@@ -66,7 +66,16 @@ var user_class = class User{
 		var game = mongoDB.collection("games").insertOne({"date" : new Date()}, function(err, result){
 			callback(result.ops[0]);
 		});
-		
+	}
+
+	exports.login = function(params, callback){
+		var query = {"username": params.username, "password": params.password};
+		mongoDB.collection("user").find(query).toArray(function(err, result) {
+		    if (err) doError(err);
+		    console.log(result);
+		    if(result.length == 0) callback(false);
+		    else callback(true);
+		  });
 	}
 
 var doError = function(e) {
