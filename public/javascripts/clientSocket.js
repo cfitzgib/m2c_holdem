@@ -15,6 +15,15 @@ socket.on('flop', function(data){
 	$("#flop").text(data.card1 + ", " + data.card2 +", " + data.card3);
 });
 
+socket.on('river', function(data){
+	console.log('river');
+	$("#flop").append("," + data.card1);
+});
+
+socket.on('turnt',  function(data){
+	console.log('turn');
+	$("#flop").append(", " + data.card1);
+});
 socket.on('game_host', function(data){
 	$("#game_start").html("You're the first one here! You're the game host! <br/><button type = 'submit' onclick='start_game()'>Start game</button>");
 	$("#game").hide();

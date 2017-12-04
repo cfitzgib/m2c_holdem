@@ -4,6 +4,7 @@ var game_in_progress = false;
 var player_cycle = 0;
 var current_turn = -1;
 var this_hand = "";
+var flop = false, turn = false, river = false;
 
 exports.init = function(io){
 	io.sockets.on('connection', function(socket){
@@ -34,8 +35,7 @@ exports.init = function(io){
 				}
 				this_hand = test_hand;
 				//console.log(test_hand.players);
-				run_betting_round(test_hand, current_players, io);
-				console.log("Done the round. Proceeding to flop:");
+				run_betting_round(this_hand, current_players, io);
 
 			}
 			else if(game_in_progress){
@@ -47,9 +47,7 @@ exports.init = function(io){
 
 			
 			
-			/*var flop = {"card1": test_hand.deal(),
-						"card2": test_hand.deal(),
-						"card3": test_hand.deal()};
+			/*
 			socket.emit('flop', flop);*/
 		});
 
@@ -60,8 +58,14 @@ exports.init = function(io){
 					//update hand wit updated bet;
 					player_cycle++;
 					current_turn = (current_turn + 1) % current_players;
-					this_hand.players[current_turn].emit('turn');
-					console.log(current_turn);
+					if(player_cycle != current_players){
+						this_hand.players[current_turn].emit('turn');
+						console.log(current_turn);
+					}
+					else{
+						process_game_action(io);
+					}
+					
 				}
 					
 				});
@@ -72,8 +76,13 @@ exports.init = function(io){
 					//update hand wit updated bet;
 					player_cycle++;
 					current_turn = (current_turn + 1) % current_players;
-					this_hand.players[current_turn].emit('turn');
-					console.log(current_turn);
+					if(player_cycle != current_players){
+						this_hand.players[current_turn].emit('turn');
+						console.log(current_turn);
+					}
+					else{
+						process_game_action(io);
+					}
 				}
 				
 
@@ -83,8 +92,13 @@ exports.init = function(io){
 					//update hand wit updated bet;
 					player_cycle = 1;
 					current_turn = (current_turn + 1) % current_players;
-					this_hand.players[current_turn].emit('turn');
-					console.log(current_turn);
+					if(player_cycle != current_players){
+						this_hand.players[current_turn].emit('turn');
+						console.log(current_turn);
+					}
+					else{
+						process_game_action(io);
+					}
 				}
 				
 			});
@@ -111,4 +125,33 @@ function run_betting_round(hand_obj, num_players, io){
 		turn_started = true;
 	}
 
+}
+
+function process_game_action(io){
+	if(!flop){
+		console.log("At the flop.");
+		var flop_cards = {"card1": this_hand.deal(),
+						"card2": this_hand.deal(),
+						"card3": this_hand.deal()};
+		io.sockets.emit('flop', flop_cards);
+		player_cycle = 0;
+		flop = true;
+		this_hand.players[current_turn].emit('turn');
+	}
+	else if(!river){
+		console.log("In the river");
+		var river_card = {"card1": this_hand.deal()};
+		io.sockets.emit('river', river_card);
+		player_cycle = 0;
+		river = true;
+		this_hand.players[current_turn].emit('turn');
+	}
+	else if(!turn){
+		console.log("In the turn");
+		var turn_card = {"card1": this_hand.deal()};
+		io.sockets.emit('turnt', turn_card);
+		player_cycle = 0;
+		turn = true;
+		this_hand.players[current_turn].emit('turn');
+	}
 }
