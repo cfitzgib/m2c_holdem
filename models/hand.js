@@ -9,6 +9,7 @@ var hand_class = class Hand{
 		this.deck = this.make_deck();
 		this.winner = "";
 		this.players = new Array();
+		this.player_hands = new Array();
 		this.total_pot = 0;
 		this.highest_bet = 0;
 		this.date = new Date();
@@ -34,17 +35,17 @@ var hand_class = class Hand{
 		return this.deck.splice(index, 1)[0];
 	}
 
-	calculate_hand_winner(player_hands, neutral_cards){
+	calculate_hand_winner( neutral_cards){
 		var players = new Array();
-		for(var i =0; i< player_hands.length; i++){
-			var player_combos = player_hands[i].concat(neutral_cards);
+		for(var i =0; i< this.player_hands.length; i++){
+			var player_combos = this.player_hands[i].concat(neutral_cards);
 			var handy = h.solve(player_combos);
 			console.log(handy.descr);
 			players.push(handy);
 		}
 		
 		var winners = h.winners(players);
-		return winners[0];
+		return winners[0].descr;
 	}
 
 	
