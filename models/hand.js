@@ -52,13 +52,15 @@ var hand_class = class Hand{
 
 	exports.hand = hand_class;
 
-	exports.create_hand = function(game_id, callback){
-		var hand = new hand_class(game_id);
+	exports.create_hand = function(db_hand){
 		mongoDB.collection('hands').insertOne(
-	    hand,                     // the object to be inserted
+	    {"game_id": db_hand.game_id,
+	     "total_pot" : db_hand.total_pot,
+	     "winner" : db_hand.winner,
+	     "date" : db_hand.date
+	    },                     // the object to be inserted
 	    function(err, status) {   
 	      if (err) doError(err);
-	      callback(hand);
 	    });
 	}
 

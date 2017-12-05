@@ -62,11 +62,7 @@ var user_class = class User{
 		});
 	}
 
-	exports.create_game = function(callback){
-		var game = mongoDB.collection("games").insertOne({"date" : new Date()}, function(err, result){
-			callback(result.ops[0]);
-		});
-	}
+	
 
 	exports.login = function(params, callback){
 		var query = {"username": params.username, "password": params.password};

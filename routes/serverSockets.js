@@ -9,6 +9,36 @@ var this_game;
 var flop = false, turn = false, river = false;
 var neutral_cards = new Array();
 
+function startNewRound(io){
+	game_in_progress = true;
+	current_turn = 0;
+	this_hand = new hand.hand(this_game._id);
+	player_cycle = 0;
+	flop = false, river = false, turn = false;
+	console.log(current_players);
+	io.sockets.emit('new_round');
+	var user_hands = new Array();
+	var clients = io.sockets.adapter.sids;
+
+	for (var clientId in clients ) {
+		var user_hand = {"card1": this_hand.deal(), "card2": this_hand.deal()};
+		
+	    var clientSocket = io.sockets.connected[clientId];
+	    if(!this_game.chip_counts[clientId])
+	    	this_game.chip_counts[clientId] = 200;
+	    this_hand.player_hands.push([user_hand["card1"], user_hand["card2"]]);
+	    this_hand.players.push(clientSocket);
+	    this_hand.player_bets.push(0);					    
+	    clientSocket.emit('deal', [user_hand, this_game.chip_counts[clientId]]);
+
+	}
+	current_players = this_hand.players.length;
+	//console.log(test_hand.players);
+	this_hand.highest_bet = 4;
+	io.sockets.emit('max_change', this_hand.highest_bet);
+	run_betting_round(this_hand, current_players, io);
+}
+
 exports.init = function(io){
 	io.sockets.on('connection', function(socket){
 		if(!game_in_progress){
@@ -27,30 +57,7 @@ exports.init = function(io){
 			//2 or more players connected 
 			if(current_players >= 2 && !game_in_progress){
 				this_game = new game.game();
-				game_in_progress = true;
-				current_turn = 0;
-				this_hand = new hand.hand(this_game._id);
-
-				var user_hands = new Array();
-				var clients = io.sockets.adapter.sids;
-				for (var clientId in clients ) {
-					var user_hand = {"card1": this_hand.deal(), "card2": this_hand.deal()};
-					
-				    var clientSocket = io.sockets.connected[clientId];
-
-				    this_game.chip_counts[clientId] = 200;
-				    console.log(this_game.chip_counts);
-				    this_hand.player_hands.push([user_hand["card1"], user_hand["card2"]]);
-				    this_hand.players.push(clientSocket);
-				    this_hand.player_bets.push(0);					    
-				    clientSocket.emit('deal', [user_hand, 200]);
-
-				}
-				//console.log(test_hand.players);
-				this_hand.highest_bet = 4;
-				io.sockets.emit('max_change', this_hand.highest_bet);
-				run_betting_round(this_hand, current_players, io);
-
+				startNewRound(io);
 			}
 			else if(game_in_progress){
 				socket.emit('cannot_start');
@@ -69,7 +76,6 @@ exports.init = function(io){
 				if(socket == this_hand.players[current_turn]){
 					
 					var chips = this_game.chip_counts[socket.id];
-					console.log(this_game.chip_counts);
 					var current_bet = this_hand.player_bets[current_turn];
 					var difference = this_hand.highest_bet - current_bet;
 					if(current_bet < this_hand.highest_bet){
@@ -102,7 +108,6 @@ exports.init = function(io){
 				
 				if(socket == this_hand.players[current_turn]){
 					
-					//update hand wit updated bet;
 					//Removing this player from the hand
 					this_hand.players.splice(current_turn, 1)[0];
 					this_hand.player_hands.splice(current_turn, 1)[0];
@@ -112,7 +117,7 @@ exports.init = function(io){
 					//Only one player left -- end the round
 					if(this_hand.players.length == 1){
 						flop = true, river = true, turn = true;
-						process_game_action();
+						process_game_action(io);
 					}
 					//Still at least two players left, continue
 					else{
@@ -131,11 +136,23 @@ exports.init = function(io){
 			socket.on('raise', function(data){
 				if(socket == this_hand.players[current_turn]){
 					//update hand wit updated bet;
+					var chips = this_game.chip_counts[socket.id];
+					var current_bet = this_hand.player_bets[current_turn];
+					var added_chips = +data + (this_hand.highest_bet - current_bet);
+					console.log(added_chips);
+					if(chips > added_chips){
+						this_game.chip_counts[socket.id] -= added_chips;
+						this_hand.highest_bet += +data;
+						console.log(this_hand.highest_bet);
+						this_hand.player_bets[current_turn] = this_hand.highest_bet;
+						this_hand.total_pot += added_chips;
+						socket.emit('bet_change', {"bet" : this_hand.player_bets[current_turn], "chips" : this_game.chip_counts[socket.id]})
+					}
 					player_cycle = 1;
 					current_turn = (current_turn + 1) % current_players;
 					if(player_cycle != current_players){
 						this_hand.players[current_turn].emit('turn', this_hand.highest_bet);
-						io.sockets.emit('max_change', this.highest_bet);
+						io.sockets.emit('max_change', this_hand.highest_bet);
 					}
 					else{
 						process_game_action(io);
@@ -203,6 +220,19 @@ function process_game_action(io){
 				break;
 			}
 		}
+		var win_socket = this_hand.players[windex];
+		this_game.chip_counts[win_socket.id] += this_hand.total_pot;
 		io.sockets.emit('winner', windex + 1);
+		setTimeout(cleanUpForNextRound, 5000, io);
 	}
 }
+
+
+function cleanUpForNextRound(io){
+	var db_hand = this_hand;
+	hand.create_hand(db_hand);
+	startNewRound(io);
+
+}
+
+

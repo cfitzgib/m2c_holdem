@@ -43,13 +43,18 @@ socket.on('cannot_start', function(){
 });
 
 socket.on('max_change', function(data){
-	$("#max_bet").text(data);
+	console.log(data);
+	$("#max_bet").html(data);
 });
 
 socket.on('bet_change', function(data){
-	$("#bet").text(data["bet"]);
+	$("#bet").html(data["bet"]);
 	$("#chips").text(data["chips"]);
-})
+});
+
+socket.on('invalid', function(){
+	$("#messages").text("That move is invalid.").fadeOut(5000);
+});
 
 socket.on('turn', function(){
 	$("#turn").text("Your turn!");
@@ -66,6 +71,14 @@ socket.on('winner', function(data){
 	$("#winner").text("Player " + data + " wins!");
 });
 
+socket.on('new_round', function(){
+	$("#cards").empty();
+	$("#card_imgs").empty();
+	$("#flop").empty();
+	$("#winner").empty();
+	$("#bet").html("0");
+
+})
 
 function start_game(){
 	socket.emit('start_game');
@@ -79,7 +92,7 @@ function check(){
 
 function raise(){
 	enable_buttons();
-	socket.emit('raise', {"amount": $("#raise_amt").val()});
+	socket.emit('raise', $("#raise_amt").val());
 }
 
 function fold(){
