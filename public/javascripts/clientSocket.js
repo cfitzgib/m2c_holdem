@@ -4,10 +4,11 @@ var socket = io.connect('/');
 
 socket.on('deal', function(data){
 	$("#game").show();
-	var c1 = find_image(data.card1), c2 = find_image(data.card2);
-	$("#cards").text(data.card1 + ", " + data.card2);
+	var c1 = find_image(data[0].card1), c2 = find_image(data[0].card2);
+	$("#cards").text(data[0].card1 + ", " + data[0].card2);
 	$("#card_imgs").html('<img src = "images/' + c1 + '"></img><img src = "images/' + c2 + '"></img>');
 	$("#game_start").text("Let's play some Hold'Em!");
+	$("#chips").text(data[1]);
 	$("#check").prop("disabled", true);
 	$("#raise").prop("disabled", true);
 	$("#fold").prop("disabled", true);
@@ -15,18 +16,15 @@ socket.on('deal', function(data){
 
 socket.on('flop', function(data){
 	var c1 = find_image(data.card1), c2 = find_image(data.card2), c3 = find_image(data.card3);
-	$("#flop").text(data.card1 + ", " + data.card2 +", " + data.card3);
-	$("#flop").append('<br/><img src = "images/' + c1 + '"></img><img src = "images/' + c2 + '"></img><img src = "images/' + c3 + '"></img>');
+	$("#flop").html('The Flop: <br/><img src = "images/' + c1 + '"></img><img src = "images/' + c2 + '"></img><img src = "images/' + c3 + '"></img>');
 });
 
 socket.on('river', function(data){
-	$("#flop").append("," + data.card1);
 	var c1 = find_image(data.card1);
 	$("#flop").append('<img src = "images/' + c1 + '"></img>');
 });
 
 socket.on('turnt',  function(data){
-	$("#flop").append(", " + data.card1);
 	var c1 = find_image(data.card1);
 	$("#flop").append('<img src = "images/' + c1 + '"></img>');
 });
@@ -44,12 +42,30 @@ socket.on('cannot_start', function(){
 	$("#game_start").text("Cannot start new game when one is already in progress.");
 });
 
+socket.on('max_change', function(data){
+	$("#max_bet").text(data);
+});
+
+socket.on('bet_change', function(data){
+	$("#bet").text(data["bet"]);
+	$("#chips").text(data["chips"]);
+})
+
 socket.on('turn', function(){
 	$("#turn").text("Your turn!");
 	$("#check").prop("disabled", false);
 	$("#raise").prop("disabled", false);
 	$("#fold").prop("disabled", false);
+});
+
+socket.on('welcome', function(data){
+	$("#welcome").html("Welcome, Player " + data + "!");
 })
+
+socket.on('winner', function(data){
+	$("#winner").text("Player " + data + " wins!");
+});
+
 
 function start_game(){
 	socket.emit('start_game');
@@ -79,17 +95,11 @@ function enable_buttons(){
 }
 
 function find_image(card_name){
-	if(card_name[1] != '0'){
-		var number = card_name[0];
-		var suit = card_name[1];
-	}
-	else{
-		var number = 10;
-		var suit = card_name[2];
-	}
-	console.log(number);
+	var number = card_name[0];
+	var suit = card_name[1];
 	var img_string = "";
-	if(number == 'J') img_string+="jack";
+	if(number == 'T') img_string+="10";
+	else if(number == 'J') img_string+="jack";
 	else if(number == 'Q') img_string+="queen";
 	else if(number == 'K') img_string+="king";
 	else if(number == 'A') img_string+="ace";
