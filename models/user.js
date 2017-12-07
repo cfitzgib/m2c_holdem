@@ -43,6 +43,13 @@ var user_class = class User{
 		  });
 	}
 
+	exports.find_by_username = function(username, callback){
+		var query = {"username": username};
+		mongoDB.collection("user").find(query).toArray(function(err, result) {
+		    callback(err, result);
+		  });
+	}
+
 	exports.update_user = function(username, new_password, callback){
 		mongoDB.collection("user").updateMany(
 			{ "username" : username},

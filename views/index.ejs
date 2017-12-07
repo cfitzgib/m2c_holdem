@@ -6,13 +6,17 @@
 	<body>
 		<h1>Hold'Em</h1>
 		<h3>Free Online Texas Hold'Em</h3>
-
+		<% if(!user_exists){ %>
 		<form action="/login" method="post">
 			Sign In
 			Username: <input type="text" id= "username" name = "username"><br/>
 			Password: <input type="password" id = "password" name = "password"><br/>
 			<input type = "submit" value="Log In">
 		</form>
+		<% }else{ %>
+			Welcome back, <%= username.charAt(0).toUpperCase() + username.slice(1) %><br/>
+			<a href = '/ingame'>Play a game!</a>
+		<% } %>
 		<div id="response"></div>
 	</body>
 </html>

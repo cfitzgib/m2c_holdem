@@ -9,11 +9,20 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+app.set('passport', require('./models/authentication.js').init(app));
 
 require('./routes/users.js').init(app);
 require('./routes/hands.js').init(app);
+
+
  
 app.use(morgan('tiny'));
+
+// Set the views directory
+app.set('views', __dirname + '/views');
+
+// Define the view (templating) engine
+app.set('view engine', 'ejs');
 
 app.use(express.static(__dirname + '/public'));
 

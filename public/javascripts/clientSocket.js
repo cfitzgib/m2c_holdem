@@ -63,9 +63,7 @@ socket.on('turn', function(){
 	$("#fold").prop("disabled", false);
 });
 
-socket.on('welcome', function(data){
-	$("#welcome").html("Welcome, Player " + data + "!");
-})
+
 
 socket.on('winner', function(data){
 	$("#winner").text("Player " + data + " wins!");
