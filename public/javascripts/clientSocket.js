@@ -42,6 +42,10 @@ socket.on('cannot_start', function(){
 	$("#game_start").text("Cannot start new game when one is already in progress.");
 });
 
+socket.on('welcome', function(){
+	socket.emit('new_user', this_user);
+});
+
 socket.on('max_change', function(data){
 	console.log(data);
 	$("#max_bet").html(data);

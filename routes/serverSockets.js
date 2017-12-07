@@ -42,10 +42,10 @@ function startNewRound(io){
 
 exports.init = function(io){
 	io.sockets.on('connection', function(socket){
-		console.log("Connection");
+		
 		if(!game_in_progress){
 			current_players++;
-			socket.emit('welcome', current_players);
+			socket.emit('welcome');
 		}	
 		//First player there is host, given option to start the game
 		if(current_players < 2 && !game_in_progress){
@@ -72,7 +72,7 @@ exports.init = function(io){
 		socket.on('new_user', function(data){
 			user_list.push(data);
 			console.log(user_list);
-		})
+		});
 
 		socket.on('check', function(){
 				if(socket == this_hand.players[current_turn]){
