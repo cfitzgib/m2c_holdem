@@ -10,6 +10,7 @@
 
 		<div id = "messages"></div>
 		<div id = "welcome"> Welcome, <%= user.username.charAt(0).toUpperCase() + user.username.slice(1) %> </div>
+		<div id = "action_log"></div>
 		<div id = "game_start">
 		</div>
 
@@ -27,6 +28,7 @@
 			You have <span id="chips"></span> chips.
 
 			<div id = "flop"></div>
+			<div id = "other_players"></div>
 			<script>
 		 		var this_user =<%- JSON.stringify(user) %>;
 			</script>

@@ -50,10 +50,11 @@ var user_class = class User{
 		  });
 	}
 
-	exports.update_user = function(username, new_password, callback){
+	exports.update_user = function(username, chips, callback){
+		console.log(chips);
 		mongoDB.collection("user").updateMany(
 			{ "username" : username},
-			{ $set: {"password" : new_password}},
+			{ $set: {"net_winnings" : chips}},
 			function(err, result){
 				if(err) doError(err);
 				callback(result);

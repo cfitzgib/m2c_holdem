@@ -47,7 +47,6 @@ socket.on('welcome', function(){
 });
 
 socket.on('max_change', function(data){
-	console.log(data);
 	$("#max_bet").html(data);
 });
 
@@ -67,6 +66,16 @@ socket.on('turn', function(){
 	$("#fold").prop("disabled", false);
 });
 
+socket.on('num_players', function(data){
+	console.log(data);
+	for(var i = 0; i<data.length; i++){
+		
+		if(this_user.username != data[i].username){
+			$("#other_players").append("<span>" + data[i].username + '<img src = "images/cardback.gif"></img><img src = "images/cardback.gif"></img>' + "</span>");
+		}
+	}
+});
+
 
 
 socket.on('winner', function(data){
@@ -80,6 +89,10 @@ socket.on('new_round', function(){
 	$("#winner").empty();
 	$("#bet").html("0");
 
+})
+
+socket.on('other_turn', function(data){
+	$("#action_log").append(data.player + " " + data.move).fadeOut(4000);
 })
 
 function start_game(){

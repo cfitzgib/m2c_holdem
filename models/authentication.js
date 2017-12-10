@@ -41,7 +41,7 @@ passport.use(new Strategy(
 
     users.find_by_username(username, function(err, foundUser) {
       if (err) { return done(err); }
-      if (!foundUser) { return done(null, false); }
+      if (!foundUser[0]) { return done(null, false); }
       if (foundUser[0].password != password) { return done(null, false); }
       return done(null, foundUser[0]);
     });
