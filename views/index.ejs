@@ -4,7 +4,7 @@
 		<script src = "form_ajax.js"></script>
 	</head>
 	<body>
-		<h1>Hold'Em</h1>
+		<% include header %>
 		<h3>Free Online Texas Hold'Em</h3>
 		<% if(!user_exists){ %>
 		<form action="/login" method="post">
@@ -13,6 +13,7 @@
 			Password: <input type="password" id = "password" name = "password"><br/>
 			<input type = "submit" value="Log In">
 		</form>
+		<a href = "/register">Don't have an account? Create one today!</a>
 		<% }else{ %>
 			Welcome back, <%= username.charAt(0).toUpperCase() + username.slice(1) %><br/>
 			<a href = '/ingame'>Play a game!</a>

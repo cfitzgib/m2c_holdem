@@ -13,6 +13,7 @@ exports.init = function(app) {
   app.post("/user", createUser);
   app.delete("/user/:username", deleteUser);
   app.post("/game", createGame);
+  app.get("/register", register);
   }
 
   function check_authentication(request, response, next){
@@ -45,6 +46,10 @@ exports.init = function(app) {
     }
   }
 
+register = function(request, response){
+  response.render('register');
+}
+
   // Handle the getUser route
 getUser = function(request, response) {
 	user.read_user(request.params.username, function(result){
@@ -60,11 +65,10 @@ updateUser = function(request, response) {
    }
 
 createUser = function(request, response) {
-  console.log(request.body);
   user.create_user ( 
-                      request.body,
+                      request.body.user,
                       function(result) {
-                        response.send(result);
+                        response.redirect('/');
                       });
 }
 
