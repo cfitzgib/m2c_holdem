@@ -25,6 +25,7 @@ function startNewRound(io){
 	
 	current_users = user_list.slice(0);
 	io.sockets.emit('new_round');
+
 	var user_hands = new Array();
 	var clients = io.sockets.adapter.sids;
 
@@ -58,15 +59,12 @@ exports.init = function(io){
 		if(!game_in_progress){
 			current_players++;
 			socket.emit('welcome');
-		}	
-		//First player there is host, given option to start the game
-		if(current_players < 2 && !game_in_progress){
 			socket.emit('game_host');
 		}
-		//Other players arriving wait for host to start game
-		else if(!game_in_progress){
+		else{
 			socket.emit('wait');
-		}
+		}	
+
 		socket.on('start_game', function(){
 			//2 or more players connected 
 			if(current_players >= 2 && !game_in_progress){
@@ -83,8 +81,11 @@ exports.init = function(io){
 
 		//Once a new user connects, push them into the user list
 		socket.on('new_user', function(data){
-			user_list.push(data);
-			current_users.push(data);
+			if(!user_list.includes(data.username)){
+				current_users.push(data.username);
+				user_list.push(data.username);
+			}
+			
 		});
 
 
@@ -110,7 +111,7 @@ exports.init = function(io){
 					//update hand wit updated bet;
 					player_cycle++;
 
-					socket.broadcast.emit('other_turn', {"player" : user_list[current_turn].username, 'move' : 'checked!'});
+					socket.broadcast.emit('other_turn', {"player" : user_list[current_turn], 'move' : 'checked!'});
 					current_turn = (current_turn + 1) % current_players;
 					if(player_cycle != current_players){
 						this_hand.players[current_turn].emit('turn');
@@ -133,8 +134,10 @@ exports.init = function(io){
 					this_hand.player_bets.splice(current_turn, 1)[0];
 					current_users.splice(current_turn, 1)[0];
 					current_players --;
+					socket.broadcast.emit('other_turn', {"player" : user_list[current_turn], 'move' : 'folded!'});
 					current_turn = current_turn % this_hand.players.length;
 					//Only one player left -- end the round
+					
 					if(this_hand.players.length == 1){
 						flop = true, river = true, turn = true;
 						process_game_action(io);
@@ -169,8 +172,10 @@ exports.init = function(io){
 						socket.emit('bet_change', {"bet" : this_hand.player_bets[current_turn], "chips" : this_game.chip_counts[socket.id]})
 					}
 					player_cycle = 1;
+					socket.broadcast.emit('other_turn', {"player" : user_list[current_turn], 'move' : 'raised!'});
 					current_turn = (current_turn + 1) % current_players;
 					if(player_cycle != current_players){
+
 						this_hand.players[current_turn].emit('turn', this_hand.highest_bet);
 						io.sockets.emit('max_change', this_hand.highest_bet);
 					}
@@ -190,7 +195,7 @@ exports.init = function(io){
 				var chip_change = this_game.chip_counts[socket.id] - 200;
 				var disconnecting_user = find_user_by_socket(socket.id);
 				console.log(chip_change);
-				user.update_user(disconnecting_user.username, chip_change, function(){});
+				user.update_user(disconnecting_user, chip_change, function(){});
 			}
 			
 		});
@@ -250,7 +255,7 @@ function process_game_action(io){
 		}
 		var win_socket = this_hand.players[windex];
 		this_game.chip_counts[win_socket.id] += this_hand.total_pot;
-		io.sockets.emit('winner', current_users[windex].username);
+		io.sockets.emit('winner', current_users[windex]);
 		this_hand.winner = current_users[windex].username;
 		setTimeout(cleanUpForNextRound, 5000, io);
 	}

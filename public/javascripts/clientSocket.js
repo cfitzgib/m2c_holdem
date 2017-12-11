@@ -35,7 +35,7 @@ socket.on('game_host', function(data){
 
 socket.on('wait', function(){
 	$("#game").hide();
-	$("#game_start").text("Another player is hosting this game. Please wait for them to start the game!");
+	$("#game_start").text("A game is currently in progress. Please wait until the next round to join.");
 });
 
 socket.on('cannot_start', function(){
@@ -67,11 +67,12 @@ socket.on('turn', function(){
 });
 
 socket.on('num_players', function(data){
+	$("#other_players").empty();
 	console.log(data);
 	for(var i = 0; i<data.length; i++){
 		
-		if(this_user.username != data[i].username){
-			$("#other_players").append("<span>" + data[i].username + '<img src = "images/cardback.gif"></img><img src = "images/cardback.gif"></img>' + "</span>");
+		if(this_user.username != data[i]){
+			$("#other_players").append("<span>" + data[i] + '<img src = "images/cardback.gif"></img><img src = "images/cardback.gif"></img>' + "</span>");
 		}
 	}
 });
@@ -92,7 +93,7 @@ socket.on('new_round', function(){
 })
 
 socket.on('other_turn', function(data){
-	$("#action_log").append(data.player + " " + data.move).fadeOut(4000);
+	$("#action_log").html(data.player + " " + data.move);
 })
 
 function start_game(){
