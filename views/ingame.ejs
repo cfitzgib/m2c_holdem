@@ -4,7 +4,7 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src = "javascripts/clientSocket.js"></script>
-		<link rel = "stylesheet" type="text/css" href = "css/game.css">
+		
 	</head>
 	<body>
 		<% include header %>
@@ -18,8 +18,18 @@
 			<div id = "winner"></div>
 			<div id = "turn"></div>
 			<div id = "jackpot"></div>
-			<button id="check" type = "button" onclick="check()">Check</button><button id="fold" type = "button" onclick="fold()">Fold</button><br/>
-			<input id="raise_amt" type = "number"><button id="raise" type = "button" onclick="raise()">Raise</button><br/>
+			<div class = "row">
+				<a id="check" class = "button round" onclick="check()">Check</button>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<a id="fold" class = "button round" onclick="fold()">Fold</a><br/>
+			</div>
+			<div class = "row">
+				<div class = "small-2 columns">
+					<input id="raise_amt" type = "number">
+				</div>
+				<a id="raise" class = "button round" onclick="raise()">Raise</a><br/>
+			</div>
+			<div id = "flop"></div>
 			Your hand this round: <span id="cards"> </span><br/>
 			<div id = "card_imgs"></div>
 			Your bet this round: <span id = "bet">0</span><br/> 
@@ -27,7 +37,7 @@
 			<br/>
 			You have <span id="chips"></span> chips.
 
-			<div id = "flop"></div>
+			
 			<div id = "other_players"></div>
 			<script>
 		 		var this_user = <%- JSON.stringify(user) %>;

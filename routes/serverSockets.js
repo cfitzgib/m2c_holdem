@@ -124,67 +124,68 @@ exports.init = function(io){
 				}
 					
 				});
-			socket.on('fold', function(){
+		
+		socket.on('fold', function(){
+			
+			if(socket == this_hand.players[current_turn]){
 				
-				if(socket == this_hand.players[current_turn]){
-					
-					//Removing this player from the hand
-					this_hand.players.splice(current_turn, 1)[0];
-					this_hand.player_hands.splice(current_turn, 1)[0];
-					this_hand.player_bets.splice(current_turn, 1)[0];
-					current_users.splice(current_turn, 1)[0];
-					current_players --;
-					socket.broadcast.emit('other_turn', {"player" : user_list[current_turn], 'move' : 'folded!'});
-					current_turn = current_turn % this_hand.players.length;
-					//Only one player left -- end the round
-					
-					if(this_hand.players.length == 1){
-						flop = true, river = true, turn = true;
-						process_game_action(io);
-					}
-					//Still at least two players left, continue
-					else{
-						if(player_cycle != current_players){
-						this_hand.players[current_turn].emit('turn', this_hand.highest_bet);
-						}
-						else{
-							process_game_action(io);
-						}
-					}
-					
+				//Removing this player from the hand
+				this_hand.players.splice(current_turn, 1)[0];
+				this_hand.player_hands.splice(current_turn, 1)[0];
+				this_hand.player_bets.splice(current_turn, 1)[0];
+				current_users.splice(current_turn, 1)[0];
+				current_players --;
+				socket.broadcast.emit('other_turn', {"player" : user_list[current_turn], 'move' : 'folded!'});
+				current_turn = current_turn % this_hand.players.length;
+				//Only one player left -- end the round
+				
+				if(this_hand.players.length == 1){
+					flop = true, river = true, turn = true;
+					process_game_action(io);
 				}
-				
-
-			});
-			socket.on('raise', function(data){
-				if(socket == this_hand.players[current_turn]){
-					//update hand wit updated bet;
-					var chips = this_game.chip_counts[socket.id];
-					var current_bet = this_hand.player_bets[current_turn];
-					var added_chips = +data + (this_hand.highest_bet - current_bet);
-					console.log(added_chips);
-					if(chips > added_chips){
-						this_game.chip_counts[socket.id] -= added_chips;
-						this_hand.highest_bet += +data;
-						console.log(this_hand.highest_bet);
-						this_hand.player_bets[current_turn] = this_hand.highest_bet;
-						this_hand.total_pot += added_chips;
-						socket.emit('bet_change', {"bet" : this_hand.player_bets[current_turn], "chips" : this_game.chip_counts[socket.id]})
-					}
-					player_cycle = 1;
-					socket.broadcast.emit('other_turn', {"player" : user_list[current_turn], 'move' : 'raised!'});
-					current_turn = (current_turn + 1) % current_players;
+				//Still at least two players left, continue
+				else{
 					if(player_cycle != current_players){
-
-						this_hand.players[current_turn].emit('turn', this_hand.highest_bet);
-						io.sockets.emit('max_change', this_hand.highest_bet);
+					this_hand.players[current_turn].emit('turn', this_hand.highest_bet);
 					}
 					else{
 						process_game_action(io);
 					}
 				}
 				
-			});
+			}
+			
+
+		});
+		socket.on('raise', function(data){
+			if(socket == this_hand.players[current_turn]){
+				//update hand wit updated bet;
+				var chips = this_game.chip_counts[socket.id];
+				var current_bet = this_hand.player_bets[current_turn];
+				var added_chips = +data + (this_hand.highest_bet - current_bet);
+				console.log(added_chips);
+				if(chips > added_chips){
+					this_game.chip_counts[socket.id] -= added_chips;
+					this_hand.highest_bet += +data;
+					console.log(this_hand.highest_bet);
+					this_hand.player_bets[current_turn] = this_hand.highest_bet;
+					this_hand.total_pot += added_chips;
+					socket.emit('bet_change', {"bet" : this_hand.player_bets[current_turn], "chips" : this_game.chip_counts[socket.id]})
+				}
+				player_cycle = 1;
+				socket.broadcast.emit('other_turn', {"player" : user_list[current_turn], 'move' : 'raised!'});
+				current_turn = (current_turn + 1) % current_players;
+				if(player_cycle != current_players){
+
+					this_hand.players[current_turn].emit('turn', this_hand.highest_bet);
+					io.sockets.emit('max_change', this_hand.highest_bet);
+				}
+				else{
+					process_game_action(io);
+				}
+			}
+			
+		});
 
 		
 

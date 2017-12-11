@@ -29,7 +29,7 @@ socket.on('turnt',  function(data){
 	$("#flop").append('<img src = "images/' + c1 + '"></img>');
 });
 socket.on('game_host', function(data){
-	$("#game_start").html("You're the first one here! You're the game host! <br/><button type = 'submit' onclick='start_game()'>Start game</button>");
+	$("#game_start").html("You're the first one here! You're the game host! <br/><a class = 'button round' onclick='start_game()'>Start game</a>");
 	$("#game").hide();
 });
 
@@ -43,7 +43,10 @@ socket.on('cannot_start', function(){
 });
 
 socket.on('welcome', function(){
-	socket.emit('new_user', this_user);
+	$(document).ready(function(){
+		socket.emit('new_user', this_user);
+	})
+	
 });
 
 socket.on('max_change', function(data){
@@ -76,8 +79,6 @@ socket.on('num_players', function(data){
 		}
 	}
 });
-
-
 
 socket.on('winner', function(data){
 	$("#winner").text("Player " + data + " wins!");
