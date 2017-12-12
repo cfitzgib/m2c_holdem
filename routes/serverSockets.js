@@ -9,6 +9,7 @@ var this_hand = "";
 var this_game;
 var flop = false, turn = false, river = false;
 var neutral_cards = new Array();
+var connected_users = new Array();
 var user_list = new Array();
 var current_users = new Array();
 
@@ -22,10 +23,8 @@ function startNewRound(io){
 	this_hand = new hand.hand(this_game._id);
 	player_cycle = 0;
 	flop = false, river = false, turn = false;
-	
-	current_users = user_list.slice(0);
 	io.sockets.emit('new_round');
-
+	user_list = new Array();
 	var user_hands = new Array();
 	var clients = io.sockets.adapter.sids;
 
@@ -44,6 +43,9 @@ function startNewRound(io){
 	    clientSocket.emit('deal', [user_hand, this_game.chip_counts[clientId]]);
 
 	}
+	create_user_list_from_sockets();
+	current_users = user_list.slice(0);
+	
 	current_players = this_hand.players.length;
 	this_hand.highest_bet = 4;
 	io.sockets.emit('num_players', user_list);
@@ -51,14 +53,31 @@ function startNewRound(io){
 	run_betting_round(this_hand, current_players, io);
 }
 
+function create_user_list_from_sockets(){
+	
+	for(var i = 0; i<this_hand.players.length; i++){
+		var sid = this_hand.players[i].id;
+		console.log(sid);
+		for(var j = 0; j<connected_users.length; j++){
+			
+			if(connected_users[j][0] == sid){
+				console.log("Equality found: " + connected_users[j][0]);
+				user_list.push(connected_users[j][1]);
+				break;
+			}
+		}
+	}
+	console.log(user_list);
+}
+
 exports.init = function(io){
 	io.sockets.on('connection', function(socket){
-		
+		socket.emit('welcome');
 		//If there is no game in progress, increment current_players
 		//and welcome player to game
 		if(!game_in_progress){
 			current_players++;
-			socket.emit('welcome');
+			
 			socket.emit('game_host');
 		}
 		else{
@@ -81,9 +100,8 @@ exports.init = function(io){
 
 		//Once a new user connects, push them into the user list
 		socket.on('new_user', function(data){
-			if(!user_list.includes(data.username)){
-				current_users.push(data.username);
-				user_list.push(data.username);
+			if(!connected_users.includes(data.username)){
+				connected_users.push([socket.id, data.username]);
 			}
 			
 		});
@@ -124,7 +142,7 @@ exports.init = function(io){
 				}
 					
 				});
-		
+
 		socket.on('fold', function(){
 			
 			if(socket == this_hand.players[current_turn]){
@@ -186,8 +204,6 @@ exports.init = function(io){
 			}
 			
 		});
-
-		
 
 		socket.on('disconnect', function () {
 			console.log("dc");
