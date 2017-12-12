@@ -1,11 +1,16 @@
 img{
-	width: 10%;
-	height: width * 1.452;
+	width: 20%;
+}
+
+#other_players img{
+	width: 200px;
+	height: 280px;
 }
 
 button.round, .button.round {
     border-radius: 1000px;
-    text-align: center; 
+    text-align: center;
+    background-color: red;
 }
 
 body{
@@ -15,15 +20,51 @@ body{
     height:100%; 
 }
 
+#turn{
+	font-family: 'Artifika';
+	font-size: 200%;
+}
+
 #banner{
 	text-align: center;
 	background-color: black;
 	margin-bottom: 0px;
+	
+}
+
+#banner h1{
+	font-family: 'Bungee Shade';
+	font-size: 300%;
 }
 
 #line{
 	margin-top: 0px;
 	background-color: red;
 	color: red;
+}
 
+#hand{
+	text-align: center;
+	font-family: 'Artifika';
+	font-size: 140%;
+}
+
+#chip_info{
+	font-family: 'Artifika';
+	font-size: 140%;
+}
+
+#chip_count{
+	vertical-align: middle;
+}
+
+a{
+	color: white;
+}
+
+@media screen and (max-width: 799px) and (min-width: 300px){
+	#chip_info{
+		font-family: 'Artifika';
+		font-size: 1em;
+	}
 }

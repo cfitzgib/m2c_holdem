@@ -71,11 +71,10 @@ socket.on('turn', function(){
 
 socket.on('num_players', function(data){
 	$("#other_players").empty();
-	console.log(data);
+	var cols_per_player = 12 / (data.length - 1);
 	for(var i = 0; i<data.length; i++){
-		
 		if(this_user.username != data[i]){
-			$("#other_players").append("<span>" + data[i] + '<img src = "images/cardback.gif"></img><img src = "images/cardback.gif"></img>' + "</span>");
+			$("#other_players").append("<div class = 'large-" +cols_per_player + " columns text-center'>" + data[i] + '<br/><img src = "images/cardback.gif"></img><img src = "images/cardback.gif"></img>' + "</div>");
 		}
 	}
 });

@@ -10,35 +10,55 @@
 		<% include header %>
 		<div id = "messages"></div>
 		<div id = "welcome"> Welcome, <%= user.username.charAt(0).toUpperCase() + user.username.slice(1) %> </div>
-		<div id = "action_log"></div>
+		
 		<div id = "game_start">
 		</div>
 
-		<div id = "game">
+		<div id = "game" class = "container">
 			<div id = "winner"></div>
-			<div id = "turn"></div>
+			<div id = "turn" class = "row text-center"></div>
+			<div id = "action_log" class = "row text-center"></div>
 			<div id = "jackpot"></div>
-			<div class = "row">
-				<a id="check" class = "button round" onclick="check()">Check</button>
-				&nbsp;&nbsp;&nbsp;&nbsp;
-				<a id="fold" class = "button round" onclick="fold()">Fold</a><br/>
-			</div>
-			<div class = "row">
-				<div class = "small-2 columns">
-					<input id="raise_amt" type = "number">
+			<div id = "chip_info" class = "row text-center">
+				<div class = "small-6 columns" data-equalizer-watch>
+				Your bet this round: <span id = "bet">0</span><br/>
+				Current max bet: <span id = "max_bet"></span>
 				</div>
-				<a id="raise" class = "button round" onclick="raise()">Raise</a><br/>
+				<div id = "chip_count" class = "small-6 columns" data-equalizer-watch>
+				You have <span id="chips"></span> chips.
+				</div>
 			</div>
-			<div id = "flop"></div>
-			Your hand this round: <span id="cards"> </span><br/>
-			<div id = "card_imgs"></div>
-			Your bet this round: <span id = "bet">0</span><br/> 
-			Current max bet: <span id = "max_bet"></span><br/> 
-			<br/>
-			You have <span id="chips"></span> chips.
-
+			<div id = "flop" class = "row text-center"></div>
+			<div class = "row">
+				<div class = "row">
+					<div  id = "hand" class = "large-centered columns">
+						Your hand<br/>
+						<div id = "card_imgs"></div>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "small-centered columns text-center">
+						<a id="check" class = "button large round" onclick="check()">Check</a>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<a id="fold" class = "button large round" onclick="fold()">Fold</a><br/>
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "small-centered small-4 columns text-center">
+						<input id="raise_amt" type = "number">
+						<a id="raise" class = "button large round" onclick="raise()">Raise</a><br/>
+					</div>
+				</div>
+				
+			</div>
 			
-			<div id = "other_players"></div>
+			<div id = "controls">
+				
+			</div>
+			
+			
+			<div id = "other_players" class = "row">
+			</div>
 			<script>
 		 		var this_user = <%- JSON.stringify(user) %>;
 			</script>
