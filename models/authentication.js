@@ -89,6 +89,8 @@ passport.deserializeUser(function(username, done) {
   });
 });
 
+//Hash function to secure passwords semi-securely
+//Obtained from https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
 String.prototype.hashCode = function() {
     var hash = 0;
     if (this.length == 0) {

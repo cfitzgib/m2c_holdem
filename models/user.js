@@ -21,6 +21,8 @@ var user_class = class User{
 		this.hand_losses = 0;
 	}
 }
+	
+	//Basic CRUD functionality throughout
 
 	exports.user = user_class;
 
@@ -43,6 +45,7 @@ var user_class = class User{
 		  });
 	}
 
+	//Find a user given their username specifically
 	exports.find_by_username = function(username, callback){
 		var query = {"username": username};
 		mongoDB.collection("user").find(query).toArray(function(err, result) {
@@ -70,34 +73,9 @@ var user_class = class User{
 		});
 	}
 
-	
-
-	exports.login = function(params, callback){
-		var query = {"username": params.username, "password": params.password.hashCode()};
-		console.log(query);
-		mongoDB.collection("user").find(query).toArray(function(err, result) {
-		    if (err) doError(err);
-		    console.log(result);
-		    if(result.length == 0) callback(false);
-		    else callback(true);
-		  });
-	}
-
 var doError = function(e) {
         console.error("ERROR: " + e);
         throw new Error(e);
     }
 
 
-String.prototype.hashCode = function() {
-    var hash = 0;
-    if (this.length == 0) {
-        return hash;
-    }
-    for (var i = 0; i < this.length; i++) {
-        char = this.charCodeAt(i);
-        hash = ((hash<<5)-hash)+char;
-        hash = hash & hash; // Convert to 32bit integer
-    }
-    return hash;
-}

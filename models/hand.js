@@ -1,7 +1,14 @@
 var ObjectId = require('mongodb').ObjectID;
-//https://github.com/goldfire/pokersolver - library for solving a poker hand given seven cards (i.e. the two of a player plus five of flop,river,turn)
+/*https://github.com/goldfire/pokersolver - 
+  library for solving a poker hand 
+  given seven cards (i.e. the two of a player
+  plus five of flop,river,turn)
+*/
 var h = require('pokersolver').Hand;
 
+//A hand can be considered like a particular round.
+//It processes all the game actions and tracks every
+//aspect of players (except chip count, tracked by game).
 var hand_class = class Hand{
 	constructor(game_id){
 		//this._id = getNextSequence("handid");
@@ -16,6 +23,7 @@ var hand_class = class Hand{
 		this.date = new Date();
 	}
 
+	//Creates a 52 card deck (2 - A for each suit)
 	make_deck(){
 		var deck = new Array();
 		var suits = ['d', 'c', 's', 'h'];
@@ -31,11 +39,14 @@ var hand_class = class Hand{
 		return deck;
 	}
 
+	//Removes a card from the deck randomly
 	deal(){
 		var index = Math.floor(Math.random() * this.deck.length);	
 		return this.deck.splice(index, 1)[0];
 	}
 
+	//Using pokersolver library, solve a hand given the neutral cards
+	//Returns the winner (ties broken randomly)
 	calculate_hand_winner( neutral_cards){
 		var players = new Array();
 		for(var i =0; i< this.player_hands.length; i++){
@@ -51,6 +62,8 @@ var hand_class = class Hand{
 }
 
 	exports.hand = hand_class;
+
+	//BASIC CRUD FUNCTIONALITY
 
 	exports.create_hand = function(db_hand){
 		mongoDB.collection('hands').insertOne(

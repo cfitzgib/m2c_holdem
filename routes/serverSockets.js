@@ -43,7 +43,9 @@ function startNewRound(io){
 	    clientSocket.emit('deal', [user_hand, this_game.chip_counts[clientId]]);
 
 	}
+	//Go through and match each socket to its user
 	create_user_list_from_sockets();
+	//Keep a copy of the user list we can alter as players fold
 	current_users = user_list.slice(0);
 	
 	current_players = this_hand.players.length;
@@ -53,6 +55,8 @@ function startNewRound(io){
 	run_betting_round(this_hand, current_players, io);
 }
 
+//Check each socket against each of the connected users to get
+//a user list that matches format of this_hand.players
 function create_user_list_from_sockets(){
 	
 	for(var i = 0; i<this_hand.players.length; i++){
@@ -61,13 +65,11 @@ function create_user_list_from_sockets(){
 		for(var j = 0; j<connected_users.length; j++){
 			
 			if(connected_users[j][0] == sid){
-				console.log("Equality found: " + connected_users[j][0]);
 				user_list.push(connected_users[j][1]);
 				break;
 			}
 		}
 	}
-	console.log(user_list);
 }
 
 exports.init = function(io){
@@ -77,9 +79,9 @@ exports.init = function(io){
 		//and welcome player to game
 		if(!game_in_progress){
 			current_players++;
-			
 			socket.emit('game_host');
 		}
+		//Have player wait for the round to end
 		else{
 			socket.emit('wait');
 		}	
@@ -90,15 +92,17 @@ exports.init = function(io){
 				this_game = new game.game();
 				startNewRound(io);
 			}
+			//Put in case someone maliciously tries to start game in progress
 			else if(game_in_progress){
 				socket.emit('cannot_start');
 			}
+			//If not enough players yet, tell user that
 			else{
 				socket.emit('no_players');
 			}
 		});
 
-		//Once a new user connects, push them into the user list
+		//Once a new user connects, push them into the connected user list
 		socket.on('new_user', function(data){
 			if(!connected_users.includes(data.username)){
 				connected_users.push([socket.id, data.username]);
@@ -106,10 +110,10 @@ exports.init = function(io){
 			
 		});
 
-
+		//Check: current max bet is being met
 		socket.on('check', function(){
 				if(socket == this_hand.players[current_turn]){
-					
+					//Calculate chip changes and change values
 					var chips = this_game.chip_counts[socket.id];
 					var current_bet = this_hand.player_bets[current_turn];
 					var difference = this_hand.highest_bet - current_bet;
@@ -126,11 +130,12 @@ exports.init = function(io){
 
 						}
 					}
-					//update hand wit updated bet;
+					
 					player_cycle++;
-
+					//tell other players what move was just made
 					socket.broadcast.emit('other_turn', {"player" : user_list[current_turn], 'move' : 'checked!'});
 					current_turn = (current_turn + 1) % current_players;
+					//If this cycle of betting is not over, emit the next player's turn
 					if(player_cycle != current_players){
 						this_hand.players[current_turn].emit('turn');
 
@@ -143,6 +148,7 @@ exports.init = function(io){
 					
 				});
 
+		//Fold: player is quitting for this round.
 		socket.on('fold', function(){
 			
 			if(socket == this_hand.players[current_turn]){
@@ -156,7 +162,6 @@ exports.init = function(io){
 				socket.broadcast.emit('other_turn', {"player" : user_list[current_turn], 'move' : 'folded!'});
 				current_turn = current_turn % this_hand.players.length;
 				//Only one player left -- end the round
-				
 				if(this_hand.players.length == 1){
 					flop = true, river = true, turn = true;
 					process_game_action(io);
@@ -172,20 +177,18 @@ exports.init = function(io){
 				}
 				
 			}
-			
-
 		});
+
+		//Raising the top bet for the round
 		socket.on('raise', function(data){
 			if(socket == this_hand.players[current_turn]){
 				//update hand wit updated bet;
 				var chips = this_game.chip_counts[socket.id];
 				var current_bet = this_hand.player_bets[current_turn];
 				var added_chips = +data + (this_hand.highest_bet - current_bet);
-				console.log(added_chips);
 				if(chips > added_chips){
 					this_game.chip_counts[socket.id] -= added_chips;
 					this_hand.highest_bet += +data;
-					console.log(this_hand.highest_bet);
 					this_hand.player_bets[current_turn] = this_hand.highest_bet;
 					this_hand.total_pot += added_chips;
 					socket.emit('bet_change', {"bet" : this_hand.player_bets[current_turn], "chips" : this_game.chip_counts[socket.id]})
@@ -205,10 +208,13 @@ exports.init = function(io){
 			
 		});
 
+
 		socket.on('reset', function(){
 			startNewRound(io);
 		});
 
+		//On a disconnect, remove that player from the game
+		//and update their net_winnings in the database
 		socket.on('disconnect', function () {
 			console.log("dc");
 			--current_players;
@@ -226,7 +232,7 @@ exports.init = function(io){
 
 }
 
-
+//Starts off an initial round of betting
 function run_betting_round(hand_obj, num_players, io){
 	player_cycle = 0;
 	var turn_started = false;
@@ -237,7 +243,9 @@ function run_betting_round(hand_obj, num_players, io){
 
 }
 
+//At key stages in the game, performs necessary actions
 function process_game_action(io){
+	//Deal out three cards for flop
 	if(!flop){
 		var flop_cards = {"card1": this_hand.deal(),
 						"card2": this_hand.deal(),
@@ -248,6 +256,7 @@ function process_game_action(io){
 		flop = true;
 		this_hand.players[current_turn].emit('turn');
 	}
+	//Deal out 4th card for river
 	else if(!river){
 		var river_card = {"card1": this_hand.deal()};
 		neutral_cards.push(river_card["card1"]);
@@ -256,6 +265,7 @@ function process_game_action(io){
 		river = true;
 		this_hand.players[current_turn].emit('turn');
 	}
+	//Deal out 5th card for turn
 	else if(!turn){
 		var turn_card = {"card1": this_hand.deal()};
 		neutral_cards.push(turn_card["card1"]);
@@ -264,6 +274,7 @@ function process_game_action(io){
 		turn = true;
 		this_hand.players[current_turn].emit('turn');
 	}
+	//Finish game, evaluate hands and find winner
 	else{
 		var results = this_hand.calculate_hand_winner(neutral_cards);
 		console.log("Winner: " + results["winner"].descr);
@@ -282,7 +293,7 @@ function process_game_action(io){
 	}
 }
 
-
+//Perform database operations for storing the hand
 function cleanUpForNextRound(io){
 	var db_hand = this_hand;
 	hand.create_hand(db_hand);
@@ -290,7 +301,7 @@ function cleanUpForNextRound(io){
 
 }
 
-
+//Given a socket, finds the corresponding user
 function find_user_by_socket(socket){
 	var index = 0;
 	for(var i = 0; i < this_hand.players.length; i++){

@@ -1,7 +1,9 @@
 var socket = io.connect('/');
 
-
-
+/*
+	Upon deal, the game has started, so process the cards dealt
+	and show all of the game elements.
+*/
 socket.on('deal', function(data){
 	$("#game").show();
 	var c1 = find_image(data[0].card1), c2 = find_image(data[0].card2);
@@ -14,34 +16,42 @@ socket.on('deal', function(data){
 	$("#fold").prop("disabled", true);
 });
 
+//Show the three cards given for the flop
 socket.on('flop', function(data){
 	var c1 = find_image(data.card1), c2 = find_image(data.card2), c3 = find_image(data.card3);
 	$("#flop").html('The Flop: <br/><img src = "images/' + c1 + '"></img><img src = "images/' + c2 + '"></img><img src = "images/' + c3 + '"></img>');
 });
 
+//Show the river card
 socket.on('river', function(data){
 	var c1 = find_image(data.card1);
 	$("#flop").append('<img src = "images/' + c1 + '"></img>');
 });
 
+//Show the turn card
 socket.on('turnt',  function(data){
 	var c1 = find_image(data.card1);
 	$("#flop").append('<img src = "images/' + c1 + '"></img>');
 });
+
+//Game has not started, give user the option to start game
 socket.on('game_host', function(data){
-	$("#game_start").html("You're the first one here! You're the game host! <br/><a class = 'button round' onclick='start_game()'>Start game</a>");
+	$("#game_start").html("Welcome to the game! <br/><a class = 'button round' onclick='start_game()'>Start game</a>");
 	$("#game").hide();
 });
 
+//Game currently ongoing. Tell user to wait until end of round.
 socket.on('wait', function(){
 	$("#game").hide();
 	$("#game_start").text("A game is currently in progress. Please wait until the next round to join.");
 });
 
+//If player tried altering page source to start game when option not allowed
 socket.on('cannot_start', function(){
 	$("#game_start").text("Cannot start new game when one is already in progress.");
 });
 
+//Once the document has loaded, tell the server which user this is
 socket.on('welcome', function(){
 	$(document).ready(function(){
 		socket.emit('new_user', this_user);
@@ -49,19 +59,23 @@ socket.on('welcome', function(){
 	
 });
 
+//When the maximum bet changes, update it client-side
 socket.on('max_change', function(data){
 	$("#max_bet").html(data);
 });
 
+//After changing your chip count, update the display to reflect that
 socket.on('bet_change', function(data){
 	$("#bet").html(data["bet"]);
 	$("#chips").text(data["chips"]);
 });
 
+
 socket.on('invalid', function(){
-	$("#messages").text("That move is invalid.").fadeOut(5000);
+	$("#messages").text("That move is invalid.");
 });
 
+//Enable the buttons on your turn
 socket.on('turn', function(){
 	$("#turn").text("Your turn!");
 	$("#check").prop("disabled", false);
@@ -69,6 +83,7 @@ socket.on('turn', function(){
 	$("#fold").prop("disabled", false);
 });
 
+//Show flipped over cards for each other player
 socket.on('num_players', function(data){
 	$("#other_players").empty();
 	var cols_per_player = 12 / (data.length - 1);
@@ -79,10 +94,13 @@ socket.on('num_players', function(data){
 	}
 });
 
+//Display the winner of a hand to client
 socket.on('winner', function(data){
 	$("#winner").text("Player " + data + " wins!");
 });
 
+//While server is starting new round, clean up
+//all the mess made during a round
 socket.on('new_round', function(){
 	$("#cards").empty();
 	$("#card_imgs").empty();
@@ -92,6 +110,7 @@ socket.on('new_round', function(){
 
 })
 
+//Show what move another player made
 socket.on('other_turn', function(data){
 	$("#action_log").html(data.player + " " + data.move);
 })
@@ -102,7 +121,6 @@ function start_game(){
 
 function check(){
 	enable_buttons();
-
 	socket.emit('check');
 }
 
@@ -116,6 +134,7 @@ function fold(){
 	socket.emit('fold');
 }
 
+//Used since all three actions require buttons to be enabled
 function enable_buttons(){
 	$("#turn").text("");
 	$("#check").prop("disabled", true);
@@ -123,10 +142,12 @@ function enable_buttons(){
 	$("#fold").prop("disabled", true);
 }
 
+//Used in emergency case if game breaks
 function restart_game(){
 	socket.emit('reset');
 }
 
+//Takes in card names and gets images to play
 function find_image(card_name){
 	var number = card_name[0];
 	var suit = card_name[1];

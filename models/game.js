@@ -7,6 +7,8 @@ var game_class = class Game{
 
 exports.game = game_class;
 
+//Games are only created
+
 exports.create_game = function(game, callback){
 		var game = mongoDB.collection("games").insertOne(game, function(err, result){
 			callback(result.ops[0]);
