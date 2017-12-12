@@ -15,7 +15,7 @@ mongoClient.connect(connection_string, function(err, db){
 var user_class = class User{
 	constructor(username, password){
 		this.username = username;
-		this.password = password;
+		this.password = password.hashCode();
 		this.net_winnings = 0;
 		this.hand_wins = 0;
 		this.hand_losses = 0;
@@ -73,7 +73,8 @@ var user_class = class User{
 	
 
 	exports.login = function(params, callback){
-		var query = {"username": params.username, "password": params.password};
+		var query = {"username": params.username, "password": params.password.hashCode()};
+		console.log(query);
 		mongoDB.collection("user").find(query).toArray(function(err, result) {
 		    if (err) doError(err);
 		    console.log(result);
@@ -88,3 +89,15 @@ var doError = function(e) {
     }
 
 
+String.prototype.hashCode = function() {
+    var hash = 0;
+    if (this.length == 0) {
+        return hash;
+    }
+    for (var i = 0; i < this.length; i++) {
+        char = this.charCodeAt(i);
+        hash = ((hash<<5)-hash)+char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+}

@@ -205,6 +205,10 @@ exports.init = function(io){
 			
 		});
 
+		socket.on('reset', function(){
+			startNewRound(io);
+		});
+
 		socket.on('disconnect', function () {
 			console.log("dc");
 			--current_players;

@@ -58,6 +58,12 @@ body{
 	vertical-align: middle;
 }
 
+#action_log{
+	font-family: 'Artifika';
+	font-size: 140%;
+	background-color: #333399;
+}
+
 a{
 	color: white;
 }

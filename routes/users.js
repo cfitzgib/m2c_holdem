@@ -14,6 +14,7 @@ exports.init = function(app) {
   app.delete("/user/:username", deleteUser);
   app.post("/game", createGame);
   app.get("/register", register);
+  app.get('/logout', check_authentication, logout);
   }
 
   function check_authentication(request, response, next){
@@ -89,4 +90,9 @@ loginUser = function(request, response){
   user.login(params, function(result){
     response.send(result);
   });
+}
+
+logout = function(request, response){
+  request.logout();
+  response.redirect('/');
 }

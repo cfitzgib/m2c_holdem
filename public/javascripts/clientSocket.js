@@ -123,6 +123,10 @@ function enable_buttons(){
 	$("#fold").prop("disabled", true);
 }
 
+function restart_game(){
+	socket.emit('reset');
+}
+
 function find_image(card_name){
 	var number = card_name[0];
 	var suit = card_name[1];

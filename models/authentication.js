@@ -42,7 +42,7 @@ passport.use(new Strategy(
     users.find_by_username(username, function(err, foundUser) {
       if (err) { return done(err); }
       if (!foundUser[0]) { return done(null, false); }
-      if (foundUser[0].password != password) { return done(null, false); }
+      if (foundUser[0].password != password.hashCode()) { return done(null, false); }
       return done(null, foundUser[0]);
     });
   }));
@@ -88,3 +88,16 @@ passport.deserializeUser(function(username, done) {
     done(err, foundUser[0]);
   });
 });
+
+String.prototype.hashCode = function() {
+    var hash = 0;
+    if (this.length == 0) {
+        return hash;
+    }
+    for (var i = 0; i < this.length; i++) {
+        char = this.charCodeAt(i);
+        hash = ((hash<<5)-hash)+char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+}

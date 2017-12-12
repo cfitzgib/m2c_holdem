@@ -59,10 +59,14 @@
 			
 			<div id = "other_players" class = "row">
 			</div>
+			
 			<script>
 		 		var this_user = <%- JSON.stringify(user) %>;
 			</script>
 		</div>
+		<a class = "button" href = '/logout'>Logout</a><br/>
+		IN CASE OF EMERGENCY ONLY:
+		<a class = "button"  onclick = "restart_game()">RESET GAME</a>
 	</body>
 
 </html>
