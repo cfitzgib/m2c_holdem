@@ -47,7 +47,7 @@ function startNewRound(io){
 	create_user_list_from_sockets();
 	//Keep a copy of the user list we can alter as players fold
 	current_users = user_list.slice(0);
-	
+	console.log(user_list);
 	current_players = this_hand.players.length;
 	this_hand.highest_bet = 4;
 	io.sockets.emit('num_players', user_list);
@@ -57,16 +57,29 @@ function startNewRound(io){
 
 //Check each socket against each of the connected users to get
 //a user list that matches format of this_hand.players
+//Additionally, removes any repeat users in the list
 function create_user_list_from_sockets(){
 	
 	for(var i = 0; i<this_hand.players.length; i++){
 		var sid = this_hand.players[i].id;
-		console.log(sid);
+		
 		for(var j = 0; j<connected_users.length; j++){
 			
 			if(connected_users[j][0] == sid){
-				user_list.push(connected_users[j][1]);
-				break;
+				console.log(connected_users[j][1]);
+				if(!(user_list.includes(connected_users[j][1]))){
+					user_list.push(connected_users[j][1]);
+				}
+				//Duplicate user, remove from game
+				else{
+					var di = user_list.length;
+					this_hand.players.splice(di, 1)[0];
+					i -=1;
+					this_hand.player_hands.splice(di, 1)[0];
+					this_hand.player_bets.splice(di, 1)[0];
+					current_users.splice(di, 1)[0];
+				}
+
 			}
 		}
 	}

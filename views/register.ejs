@@ -1,11 +1,14 @@
 <% include header %>
 
-<h1> Let's Gamble! </h1>
-<h3> Enter your information below and we'll get you in a game!</h3>
-<form action = "/user" method = "post">
-	<div class = "form-group">
-		Username:<input type = "text" name = "user[username]"><br/>
-		Password:<input type = "password" name = "user[password]"><br/>
-		<input type = "submit" class = "button">
-	</div>
-</form>
+<div class = "row column large-3">
+	<h1> Let's Gamble! </h1>
+	<h3> Enter your information below and we'll get you signed up!</h3>
+	<form action = "/user" method = "post">
+		<div class = "form-group">
+			Username:<input type = "text" name = "user[username]"><br/>
+			Password:<input type = "password" name = "user[password]"><br/>
+			<input type = "submit" class = "button" value = "Sign up">
+		</div>
+
+	</form>
+</div>

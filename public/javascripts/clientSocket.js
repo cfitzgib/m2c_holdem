@@ -9,7 +9,7 @@ socket.on('deal', function(data){
 	var c1 = find_image(data[0].card1), c2 = find_image(data[0].card2);
 	$("#cards").text(data[0].card1 + ", " + data[0].card2);
 	$("#card_imgs").html('<img src = "images/' + c1 + '"></img><img src = "images/' + c2 + '"></img>');
-	$("#game_start").text("Let's play some Hold'Em!");
+	$("#game_start").hide();
 	$("#chips").text(data[1]);
 	$("#check").prop("disabled", true);
 	$("#raise").prop("disabled", true);
@@ -107,6 +107,7 @@ socket.on('new_round', function(){
 	$("#flop").empty();
 	$("#winner").empty();
 	$("#bet").html("0");
+	$("#action_log").empty();
 
 })
 

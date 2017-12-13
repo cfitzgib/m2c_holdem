@@ -10,12 +10,13 @@
 		<% include header %>
 		<div id = "messages"></div>
 		<div id = "welcome"> Welcome, <%= user.username.charAt(0).toUpperCase() + user.username.slice(1) %> </div>
-		
-		<div id = "game_start">
+		<div class = "row column large-3">
+			
+			<div id = "game_start">
+			</div>
 		</div>
-
 		<div id = "game" class = "container">
-			<div id = "winner"></div>
+			<div id = "winner" class = "row text-center"></div>
 			<div id = "turn" class = "row text-center"></div>
 			<div id = "action_log" class = "row text-center"></div>
 			<div id = "jackpot"></div>

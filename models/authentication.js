@@ -47,7 +47,20 @@ passport.use(new Strategy(
     });
   }));
 
-
+//Hash function to secure passwords semi-securely
+//Obtained from https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
+String.prototype.hashCode = function() {
+    var hash = 0;
+    if (this.length == 0) {
+        return hash;
+    }
+    for (var i = 0; i < this.length; i++) {
+        char = this.charCodeAt(i);
+        hash = ((hash<<5)-hash)+char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+}
 /*
  * Define Passport authenticated session persistence.
  * Passport sessions will restore authentication state and user information
@@ -89,17 +102,3 @@ passport.deserializeUser(function(username, done) {
   });
 });
 
-//Hash function to secure passwords semi-securely
-//Obtained from https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
-String.prototype.hashCode = function() {
-    var hash = 0;
-    if (this.length == 0) {
-        return hash;
-    }
-    for (var i = 0; i < this.length; i++) {
-        char = this.charCodeAt(i);
-        hash = ((hash<<5)-hash)+char;
-        hash = hash & hash; // Convert to 32bit integer
-    }
-    return hash;
-}

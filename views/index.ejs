@@ -1,24 +1,26 @@
 <html>
 	<head>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-		<script src = "form_ajax.js"></script>
+		<script src = "javascripts/form_ajax.js"></script>
 	</head>
 	<body>
 		<% include header %>
 		
 		<% if(!user_exists){ %>
-		<form action="/login" method="post">
-			<h3>Sign In</h3>
-			Username: <input type="text" id= "username" name = "username"><br/>
-			Password: <input type="password" id = "password" name = "password"><br/>
-			<input type = "submit" class = "button" value="Log In">
-		</form>
-		<a href = "/register">Don't have an account? Create one today!</a>
-		<% }else{ %>
-			Welcome back, <%= username.charAt(0).toUpperCase() + username.slice(1) %><br/>
-			<a href = '/ingame'>Play a game!</a>
-			<a href = '/logout'>Logout</a>
-		<% } %>
-		<div id="response"></div>
+		<div class = "row column large-3">
+			<form action="/login" method="post">
+				<h3>Sign In</h3>
+				Username: <input type="text" id= "username" name = "username"><br/>
+				Password: <input type="password" id = "password" name = "password"><br/>
+				<input type = "submit" class = "button" value="Log In">
+			</form>
+			<a href = "/register">Don't have an account? Register here!</a>
+			<% }else{ %>
+				Welcome back, <%= username.charAt(0).toUpperCase() + username.slice(1) %><br/>
+				<a href = '/ingame'>Play a game!</a>
+				<a href = '/logout'>Logout</a>
+			<% } %>
+			<div id="response"></div>
+		</div>
 	</body>
 </html>
