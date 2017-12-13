@@ -1,10 +1,10 @@
 img{
-	width: 20%;
+	width: 10%;
 }
 
 #other_players img{
-	width: 200px;
-	height: 280px;
+	width: 100px;
+	height: 140px;
 }
 
 button.round, .button.round {
@@ -71,5 +71,9 @@ a{
 	#chip_info{
 		font-family: 'Artifika';
 		font-size: 1em;
+	}
+
+	img{
+		width: 20%;
 	}
 }

@@ -37,6 +37,7 @@ socket.on('turnt',  function(data){
 //Game has not started, give user the option to start game
 socket.on('game_host', function(data){
 	$("#game_start").html("Welcome to the game! <br/><a class = 'button round' onclick='start_game()'>Start game</a>");
+	$("#game_start").show();
 	$("#game").hide();
 });
 
@@ -89,14 +90,14 @@ socket.on('num_players', function(data){
 	var cols_per_player = 12 / (data.length - 1);
 	for(var i = 0; i<data.length; i++){
 		if(this_user.username != data[i]){
-			$("#other_players").append("<div class = 'large-" +cols_per_player + " columns text-center'>" + data[i] + '<br/><img src = "images/cardback.gif"></img><img src = "images/cardback.gif"></img>' + "</div>");
+			$("#other_players").append("<div class = 'large-" +cols_per_player + " columns text-center'>" + data[i] + '<br/><img width="10%" src = "images/cardback.gif"></img><img src = "images/cardback.gif"></img>' + "</div>");
 		}
 	}
 });
 
 //Display the winner of a hand to client
 socket.on('winner', function(data){
-	$("#winner").text("Player " + data + " wins!");
+	$("#winner").text("Player " + data.win_user + " wins with " + data.rank + "!");
 });
 
 //While server is starting new round, clean up

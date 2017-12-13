@@ -2,6 +2,7 @@ var hand = require("../models/hand.js");
 var game = require("../models/game.js");
 var user = require("../models/user.js");
 var current_players = 0;
+var total_players = 0;
 var game_in_progress = false;
 var player_cycle = 0;
 var current_turn = -1;
@@ -47,7 +48,6 @@ function startNewRound(io){
 	create_user_list_from_sockets();
 	//Keep a copy of the user list we can alter as players fold
 	current_users = user_list.slice(0);
-	console.log(user_list);
 	current_players = this_hand.players.length;
 	this_hand.highest_bet = 4;
 	io.sockets.emit('num_players', user_list);
@@ -66,7 +66,6 @@ function create_user_list_from_sockets(){
 		for(var j = 0; j<connected_users.length; j++){
 			
 			if(connected_users[j][0] == sid){
-				console.log(connected_users[j][1]);
 				if(!(user_list.includes(connected_users[j][1]))){
 					user_list.push(connected_users[j][1]);
 				}
@@ -88,6 +87,7 @@ function create_user_list_from_sockets(){
 exports.init = function(io){
 	io.sockets.on('connection', function(socket){
 		socket.emit('welcome');
+		total_players++;
 		//If there is no game in progress, increment current_players
 		//and welcome player to game
 		if(!game_in_progress){
@@ -223,18 +223,29 @@ exports.init = function(io){
 
 
 		socket.on('reset', function(){
-			startNewRound(io);
+			game_in_progress = false;
+			current_players = total_players;
+			player_cycle = 0;
+			current_turn = -1;
+			this_hand = "";
+			this_game;
+			flop = false, turn = false, river = false;
+			neutral_cards = new Array();
+			connected_users = new Array();
+			user_list = new Array();
+			current_users = new Array();
+			io.sockets.emit('game_host');
+			io.sockets.emit('welcome');
 		});
 
 		//On a disconnect, remove that player from the game
 		//and update their net_winnings in the database
 		socket.on('disconnect', function () {
-			console.log("dc");
+			--total_players;
 			--current_players;
 			if(this_game && this_game.chip_counts[socket.id]){
 				var chip_change = this_game.chip_counts[socket.id] - 200;
 				var disconnecting_user = find_user_by_socket(socket.id);
-				console.log(chip_change);
 				user.update_user(disconnecting_user, chip_change, function(){});
 			}
 			
@@ -300,7 +311,7 @@ function process_game_action(io){
 		}
 		var win_socket = this_hand.players[windex];
 		this_game.chip_counts[win_socket.id] += this_hand.total_pot;
-		io.sockets.emit('winner', current_users[windex]);
+		io.sockets.emit('winner', {"win_user" : current_users[windex], "rank" : results["winner"].descr});
 		this_hand.winner = current_users[windex].username;
 		setTimeout(cleanUpForNextRound, 5000, io);
 	}
